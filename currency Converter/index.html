@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    
+    <div class="container">
+        <header>
+            <h1>🌍 Currency Converter 🌍</h1>
+            <p>Convert any currency from one country to another.</p>
+        </header>
+
+        <form action="/convert" method="POST">
+            <div class="form-group">
+                <label for="base_currency">Base Currency:</label>
+                <select id="base_currency" name="base_currency" required>
+                    {% for currency in currencies %}
+                    <option value="{{ currency }}">{{ currency }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="target_currency">Target Currency:</label>
+                <select id="target_currency" name="target_currency" required>
+                    {% for currency in currencies %}
+                    <option value="{{ currency }}">{{ currency }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" placeholder="e.g., 100" required>
+            </div>
+            <button type="submit">Convert</button>
+        </form>
+
+        {% if converted_amount is not none %}
+        <div class="result">
+            <p><strong>{{ amount }} {{ base_currency }}</strong> == <strong>{{ converted_amount }} {{ target_currency }}</strong></p>
+            <p>Exchange Rate: 1 {{ base_currency }} = {{ rate }} {{ target_currency }}</p>
+        </div>
+        {% elif error is not none %}
+        <div class="error">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
