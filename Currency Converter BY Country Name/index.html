@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+        <form id="converter-form">
+            <label for="base">From:</label>
+            <select id="base" name="base">
+                <!-- Populated dynamically -->
+            </select>
+            
+            <label for="target">To:</label>
+            <select id="target" name="target">
+                <!-- Populated dynamically -->
+            </select>
+            
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" required>
+            
+            <button type="submit">Convert</button>
+        </form>
+        <div id="result">Wait For You Result Here</div>
+    </div>
+
+    <script>
+        // List of all countries and their currency codes
+        const countryCurrencies = {
+            "Afghanistan (AFN)": "AFN",
+            "Albania (ALL)": "ALL",
+            "Algeria (DZD)": "DZD",
+            "Andorra (EUR)": "EUR",
+            "Angola (AOA)": "AOA",
+            "Argentina (ARS)": "ARS",
+            "Armenia (AMD)": "AMD",
+            "Australia (AUD)": "AUD",
+            "Austria (EUR)": "EUR",
+            "Azerbaijan (AZN)": "AZN",
+            "Bahamas (BSD)": "BSD",
+            "Bahrain (BHD)": "BHD",
+            "Bangladesh (BDT)": "BDT",
+            "Barbados (BBD)": "BBD",
+            "Belarus (BYN)": "BYN",
+            "Belgium (EUR)": "EUR",
+            "Belize (BZD)": "BZD",
+            "Benin (XOF)": "XOF",
+            "Bhutan (BTN)": "BTN",
+            "Bolivia (BOB)": "BOB",
+            "Bosnia and Herzegovina (BAM)": "BAM",
+            "Botswana (BWP)": "BWP",
+            "Brazil (BRL)": "BRL",
+            "Brunei (BND)": "BND",
+            "Bulgaria (BGN)": "BGN",
+            "Burkina Faso (XOF)": "XOF",
+            "Burundi (BIF)": "BIF",
+            "Cambodia (KHR)": "KHR",
+            "Cameroon (XAF)": "XAF",
+            "Canada (CAD)": "CAD",
+            "Cape Verde (CVE)": "CVE",
+            "Chad (XAF)": "XAF",
+            "Chile (CLP)": "CLP",
+            "China (CNY)": "CNY",
+            "Colombia (COP)": "COP",
+            "Comoros (KMF)": "KMF",
+            "Congo (XAF)": "XAF",
+            "Costa Rica (CRC)": "CRC",
+            "Croatia (HRK)": "HRK",
+            "Cuba (CUP)": "CUP",
+            "Cyprus (EUR)": "EUR",
+            "Czech Republic (CZK)": "CZK",
+            "Denmark (DKK)": "DKK",
+            "Djibouti (DJF)": "DJF",
+            "Dominican Republic (DOP)": "DOP",
+            "Ecuador (USD)": "USD",
+            "Egypt (EGP)": "EGP",
+            "El Salvador (USD)": "USD",
+            "Equatorial Guinea (XAF)": "XAF",
+            "Estonia (EUR)": "EUR",
+            "Ethiopia (ETB)": "ETB",
+            "Fiji (FJD)": "FJD",
+            "Finland (EUR)": "EUR",
+            "France (EUR)": "EUR",
+            "Gabon (XAF)": "XAF",
+            "Gambia (GMD)": "GMD",
+            "Georgia (GEL)": "GEL",
+            "Germany (EUR)": "EUR",
+            "Ghana (GHS)": "GHS",
+            "Greece (EUR)": "EUR",
+            "Grenada (XCD)": "XCD",
+            "Guatemala (GTQ)": "GTQ",
+            "Guinea (GNF)": "GNF",
+            "Guyana (GYD)": "GYD",
+            "Honduras (HNL)": "HNL",
+            "Hungary (HUF)": "HUF",
+            "Iceland (ISK)": "ISK",
+            "India (INR)": "INR",
+            "Indonesia (IDR)": "IDR",
+            "Iran (IRR)": "IRR",
+            "Iraq (IQD)": "IQD",
+            "Ireland (EUR)": "EUR",
+            "Israel (ILS)": "ILS",
+            "Italy (EUR)": "EUR",
+            "Jamaica (JMD)": "JMD",
+            "Japan (JPY)": "JPY",
+            "Jordan (JOD)": "JOD",
+            "Kazakhstan (KZT)": "KZT",
+            "Kenya (KES)": "KES",
+            "Kiribati (AUD)": "AUD",
+            "Kuwait (KWD)": "KWD",
+            "Kyrgyzstan (KGS)": "KGS",
+            "Laos (LAK)": "LAK",
+            "Latvia (EUR)": "EUR",
+            "Lebanon (LBP)": "LBP",
+            "Lesotho (LSL)": "LSL",
+            "Liberia (LRD)": "LRD",
+            "Libya (LYD)": "LYD",
+            "Lithuania (EUR)": "EUR",
+            "Luxembourg (EUR)": "EUR",
+            "Madagascar (MGA)": "MGA",
+            "Malawi (MWK)": "MWK",
+            "Malaysia (MYR)": "MYR",
+            "Maldives (MVR)": "MVR",
+            "Mali (XOF)": "XOF",
+            "Malta (EUR)": "EUR",
+            "Marshall Islands (USD)": "USD",
+            "Mauritania (MRU)": "MRU",
+            "Mauritius (MUR)": "MUR",
+            "Mexico (MXN)": "MXN",
+            "Micronesia (USD)": "USD",
+            "Moldova (MDL)": "MDL",
+            "Monaco (EUR)": "EUR",
+            "Mongolia (MNT)": "MNT",
+            "Montenegro (EUR)": "EUR",
+            "Morocco (MAD)": "MAD",
+            "Mozambique (MZN)": "MZN",
+            "Myanmar (MMK)": "MMK",
+            "Namibia (NAD)": "NAD",
+            "Nauru (AUD)": "AUD",
+            "Nepal (NPR)": "NPR",
+            "Netherlands (EUR)": "EUR",
+            "New Zealand (NZD)": "NZD",
+            "Nicaragua (NIO)": "NIO",
+            "Niger (XOF)": "XOF",
+            "Nigeria (NGN)": "NGN",
+            "Norway (NOK)": "NOK",
+            "Oman (OMR)": "OMR",
+            "Pakistan (PKR)": "PKR",
+            "Palau (USD)": "USD",
+            "Panama (PAB)": "PAB",
+            "Papua New Guinea (PGK)": "PGK",
+            "Paraguay (PYG)": "PYG",
+            "Peru (PEN)": "PEN",
+            "Philippines (PHP)": "PHP",
+            "Poland (PLN)": "PLN",
+            "Portugal (EUR)": "EUR",
+            "Qatar (QAR)": "QAR",
+            "Romania (RON)": "RON",
+            "Russia (RUB)": "RUB",
+            "Rwanda (RWF)": "RWF",
+            "Saudi Arabia (SAR)": "SAR",
+            "Senegal (XOF)": "XOF",
+            "Serbia (RSD)": "RSD",
+            "Seychelles (SCR)": "SCR",
+            "Sierra Leone (SLL)": "SLL",
+            "Singapore (SGD)": "SGD",
+            "Slovakia (EUR)": "EUR",
+            "Slovenia (EUR)": "EUR",
+            "Somalia (SOS)": "SOS",
+            "South Africa (ZAR)": "ZAR",
+            "South Korea (KRW)": "KRW",
+            "Spain (EUR)": "EUR",
+            "Sri Lanka (LKR)": "LKR",
+            "Sudan (SDG)": "SDG",
+            "Suriname (SRD)": "SRD",
+            "Sweden (SEK)": "SEK",
+            "Switzerland (CHF)": "CHF",
+            "Syria (SYP)": "SYP",
+            "Taiwan (TWD)": "TWD",
+            "Tajikistan (TJS)": "TJS",
+            "Tanzania (TZS)": "TZS",
+            "Thailand (THB)": "THB",
+            "Timor-Leste (USD)": "USD",
+            "Togo (XOF)": "XOF",
+            "Tonga (TOP)": "TOP",
+            "Trinidad and Tobago (TTD)": "TTD",
+            "Tunisia (TND)": "TND",
+            "Turkey (TRY)": "TRY",
+            "Turkmenistan (TMT)": "TMT",
+            "Uganda (UGX)": "UGX",
+            "Ukraine (UAH)": "UAH",
+            "United Arab Emirates (AED)": "AED",
+            "United Kingdom (GBP)": "GBP",
+            "United States (USD)": "USD",
+            "Uruguay (UYU)": "UYU",
+            "Uzbekistan (UZS)": "UZS",
+            "Vanuatu (VUV)": "VUV",
+            "Venezuela (VES)": "VES",
+            "Vietnam (VND)": "VND",
+            "Yemen (YER)": "YER",
+            "Zambia (ZMW)": "ZMW",
+            "Zimbabwe (ZWL)": "ZWL"
+        };
+
+        const baseSelect = document.getElementById('base');
+        const targetSelect = document.getElementById('target');
+
+// Populate the dropdowns with all countries and currencies
+Object.entries(countryCurrencies).forEach(([country, currency]) => {
+    const optionBase = document.createElement('option');
+    optionBase.value = currency;
+    optionBase.textContent = country;
+    baseSelect.appendChild(optionBase);
+
+    const optionTarget = document.createElement('option');
+    optionTarget.value = currency;
+    optionTarget.textContent = country;
+    targetSelect.appendChild(optionTarget);
+});
+
+// Handle form submission
+document.getElementById('converter-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const base = baseSelect.value;
+    const target = targetSelect.value;
+    const amount = document.getElementById('amount').value;
+
+    const response = await fetch('/convert', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ base, target, amount }),
+    });
+
+    const data = await response.json();
+    const resultDiv = document.getElementById('result');
+    if (data.converted_amount) {
+        resultDiv.textContent = `Converted Amount: ${data.converted_amount} (${target})`;
+    } else {
+        resultDiv.textContent = 'Error converting currency.';
+    }
+});
+</script>
+</body>
+</html>
